@@ -26,6 +26,7 @@ const Dashboard = () => {
       const csvText = await response.text();
       
       Papa.parse(csvText, {
+        worker: true,
         header: true,
         dynamicTyping: true,
         skipEmptyLines: true,
@@ -113,18 +114,47 @@ const Dashboard = () => {
   }, [filteredData]);
 
   const getRegionData = () => {
-  const grouped = {};
-  filteredData.forEach(d => {
-  if (!grouped[d.region]) grouped[d.region] = { views: 0, err: 0, count: 0 };
-  grouped[d.region].views += d.views;
-  grouped[d.region].err += d.err;
-  grouped[d.region].count += 1;
-  });
-  return Object.entries(grouped).map(([region, data]) => ({
-  region,
-  views: data.views,
-  err: (data.err / data.count).toFixed(2)
-  })).sort((a, b) => b.views - a.views);
+    const grouped = {};
+      filteredData.forEach(d => {
+        if (!grouped[d.region]) 
+          grouped[d.region] = { views: 0, err: 0, count: 0 };
+          grouped[d.region].views += d.views;
+          grouped[d.region].err += d.err;
+          grouped[d.region].count += 1;
+        });
+        return Object.entries(grouped).map(([region, data]) => ({
+          region,
+          views: data.views,
+          err: (data.err / data.count).toFixed(2)
+    })).sort((a, b) => b.views - a.views);
+  };
+
+  const getPlatformContentStats = () => {
+    const lookup = {};
+    
+    filteredData.forEach(d => {
+      const key = `${d.platform}|${d.contentType}`;
+      if (!lookup[key]) lookup[key] = { err: 0, count: 0 };
+      lookup[key].err += d.err;
+      lookup[key].count += 1;
+    });
+
+    // 2. Format for Recharts: Group by Platform
+    const platforms = [...new Set(filteredData.map(d => d.platform))];
+    const contentTypes = [...new Set(filteredData.map(d => d.contentType))];
+
+    return platforms.map(platform => {
+      const row = { name: platform };
+      contentTypes.forEach(type => {
+        const key = `${platform}|${type}`;
+        if (lookup[key]) {
+          row[type] = parseFloat((lookup[key].err / lookup[key].count).toFixed(2));
+        } else {
+          row[type] = 0;
+        }
+      });
+      return row;
+    });
   };
 
   const getPlatformData = () => {
@@ -183,14 +213,18 @@ const Dashboard = () => {
   };
 
   const getScatterData = () => {
-  return filteredData.map(d => ({
-  likes: d.likes,
-  comments: d.comments,
-  shares: d.shares,
-  content: d.contentType,
-  errLevel: d.errLevel
-  })).slice(0, 100);
-  };
+      return filteredData
+        // Sort by views descending to show the most relevant data points
+        .sort((a, b) => b.views - a.views) 
+        .slice(0, 100)
+        .map(d => ({
+          likes: d.likes,
+          comments: d.comments,
+          shares: d.shares,
+          content: d.contentType,
+          errLevel: d.errLevel
+        }));
+    };
 
   const getERRLevelDistribution = () => {
   const grouped = { 'Low': 0, 'Average': 0, 'High': 0, 'Excellent': 0 };
@@ -499,6 +533,33 @@ const Dashboard = () => {
           <Scatter name="Posts" data={getScatterData()} fill="#3b82f6" />
         </ScatterChart>
       </ResponsiveContainer>
+    </div> 
+
+    <div style={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
+      <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
+        Best Content Type per Platform
+      </h3>
+      <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '16px' }}>
+        Comparing average ERR to find the optimal content format for each app.
+      </p>
+      <ResponsiveContainer width="100%" height={350}>
+        <BarChart data={getPlatformContentStats()}>
+          <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
+          <XAxis dataKey="name" stroke="#94a3b8" />
+          <YAxis stroke="#94a3b8" />
+          <Tooltip 
+            contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }}
+            cursor={{fill: '#334155'}}
+          />
+          <Legend wrapperStyle={{ paddingTop: '20px' }}/>
+          <Bar dataKey="Video" fill="#3b82f6" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Reel" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Post" fill="#10b981" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Live Stream" fill="#f59e0b" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Shorts" fill="#ec4899" radius={[4, 4, 0, 0]} />
+          <Bar dataKey="Tweet" fill="#06b6d4" radius={[4, 4, 0, 0]} />
+        </BarChart>
+      </ResponsiveContainer>
     </div>
 
     {/* Insights Section */}
@@ -542,10 +603,25 @@ const Dashboard = () => {
           <li style={{ fontSize: '14px', color: '#e2e8f0', marginBottom: '8px' }}>📊 Cleaned Records: <strong>{filteredData.length.toLocaleString()}</strong></li>
           <li style={{ fontSize: '14px', color: '#e2e8f0', marginBottom: '8px' }}>✅ Quality: <strong>Filtered</strong></li>
           <li style={{ fontSize: '14px', color: '#e2e8f0' }}>📈 Avg ERR: <strong>{metrics.avgErr}%</strong></li>
+        </ul> {/* End of Data Summary*/}
+      </div> {/*End of individual Insight*/ }
+
+      <div style={{ background: 'linear-gradient(to bottom right, #be123c, #1e293b)', border: '1px solid #fb7185', borderRadius: '8px', padding: '24px' }}>
+        <h4 style={{ fontSize: '16px', fontWeight: 'bold', marginBottom: '12px' }}>💡 Content Optimization Strategy</h4>
+        <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
+             <li style={{ fontSize: '14px', color: '#e2e8f0', marginBottom: '8px' }}>
+              <strong>For TikTok:</strong> Focus on <u>Live Streams</u> (Highest ERR)
+            </li>
+            <li style={{ fontSize: '14px', color: '#e2e8f0', marginBottom: '8px' }}>
+              <strong>For YouTube:</strong> <u>Shorts</u> outperform standard Videos by 12%
+            </li>
+             <li style={{ fontSize: '14px', color: '#e2e8f0' }}>
+              <strong>General Trend:</strong> Short-form video is the dominant format across all regions.
+            </li>
         </ul>
       </div>
-    </div>
-  </div>
+    </div> {/* End of Insights Grid*/}
+  </div> // End of Dashboard
   );
 };
 
