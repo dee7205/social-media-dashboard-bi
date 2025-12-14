@@ -1,5 +1,9 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { BarChart, Bar, LineChart, Line, ScatterChart, Scatter, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
+import { 
+  BarChart, Bar, LineChart, Line, ScatterChart, Scatter, 
+  XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, Legend, 
+  ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area 
+} from 'recharts';
 import { TrendingUp, Globe, Users, Heart, Filter, X, Loader } from 'lucide-react';
 import Papa from 'papaparse';
 
@@ -523,17 +527,65 @@ const Dashboard = () => {
     </div>
 
     <div style={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
-      <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>Likes vs Comments Analysis</h3>
+      <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
+        Likes vs Comments (Size = Shares)
+      </h3>
+      <p style={{ color: '#94a3b8', fontSize: '14px', marginBottom: '16px' }}>
+        Bubble size represents total <strong>Shares</strong>. Larger bubbles = higher virality.
+      </p>
       <ResponsiveContainer width="100%" height={350}>
         <ScatterChart margin={{ top: 20, right: 20, bottom: 20, left: 20 }}>
           <CartesianGrid strokeDasharray="3 3" stroke="#475569" />
-          <XAxis dataKey="likes" type="number" stroke="#94a3b8" name="Likes" />
-          <YAxis dataKey="comments" type="number" stroke="#94a3b8" name="Comments" />
-          <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }} />
-          <Scatter name="Posts" data={getScatterData()} fill="#3b82f6" />
+          
+          <XAxis 
+            dataKey="likes" 
+            type="number" 
+            stroke="#94a3b8" 
+            name="Likes" 
+            tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`} 
+            label={{ value: 'Likes', position: 'bottom', offset: 0, fill: '#94a3b8' }}
+          />
+          
+          <YAxis 
+            dataKey="comments" 
+            type="number" 
+            stroke="#94a3b8" 
+            name="Comments" 
+            tickFormatter={(value) => `${(value / 1000).toFixed(0)}k`}
+            label={{ value: 'Comments', angle: -90, position: 'left', offset: 0, fill: '#94a3b8' }}
+          />
+          
+          {/* THIS CONTROLS THE BUBBLE SIZE */}
+          <ZAxis 
+            type="number" 
+            dataKey="shares" 
+            range={[60, 600]} 
+            name="Shares" 
+          />
+
+          <Tooltip 
+            cursor={{ strokeDasharray: '3 3' }} 
+            content={({ active, payload }) => {
+              if (active && payload && payload.length) {
+                const data = payload[0].payload;
+                return (
+                  <div style={{ background: '#1e293b', border: '1px solid #475569', padding: '12px', borderRadius: '8px' }}>
+                    <p style={{ color: '#fff', fontWeight: 'bold', marginBottom: '4px' }}>{data.content}</p>
+                    <p style={{ color: '#60a5fa', fontSize: '12px' }}>Likes: {data.likes.toLocaleString()}</p>
+                    <p style={{ color: '#a78bfa', fontSize: '12px' }}>Comments: {data.comments.toLocaleString()}</p>
+                    <p style={{ color: '#34d399', fontSize: '12px' }}>Shares: {data.shares.toLocaleString()}</p>
+                  </div>
+                );
+              }
+              return null;
+            }}
+          />
+          
+          {/* I added fillOpacity to see overlapping bubbles */}
+          <Scatter name="Posts" data={getScatterData()} fill="#3b82f6" fillOpacity={0.6} />
         </ScatterChart>
       </ResponsiveContainer>
-    </div> 
+    </div>
 
     <div style={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px', padding: '24px', marginBottom: '24px' }}>
       <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>
