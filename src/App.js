@@ -289,7 +289,7 @@ const Dashboard = () => {
   };
 
     const filteredAggData = useMemo(() => {
-      return aggredatedData.filter(item => {
+      return aggregatedData.filter(item => {
         // Conditions to see whether the record follows the filters.
         if (aggFilters.region && item.region !== aggFilters.region) return false;
         if (aggFilters.contentType && item.contentType !== aggFilters.contentType) return false;
