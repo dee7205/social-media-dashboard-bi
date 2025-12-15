@@ -11,6 +11,7 @@ const Dashboard = () => {
   const [allData, setAllData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [aggregatedData, setAggregatedData] = useState([])
 
   const [filters, setFilters] = useState({
     region: null,
@@ -19,102 +20,144 @@ const Dashboard = () => {
     hashtag: null,
   });
 
+  const [aggFilters, setAggFilters] = useState({
+    region: null,
+    contentType: null,
+    hashtag: null
+  })
+
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
-  const loadCSV = async () => {
-    try {
-      const response = await fetch('/Cleaned_Viral_Social_Media_Trends_FINAL.csv');
-      if (!response.ok) throw new Error('CSV file not found');
+    const loadCSV = async () => {
+      try {
+        const response = await fetch('/Cleaned_Viral_Social_Media_Trends_FINAL.csv');
+        const other_response = await fetch('/For_Platform_Predicting.csv');
 
-      const csvText = await response.text();
-      
-      Papa.parse(csvText, {
-        worker: true,
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: (results) => {
-          const transformedData = results.data
-            .filter(row => row.Post_Date && row.Views)
-            .map((row, idx) => {
-              const views = parseInt(row.Views) || 0;
-              const likes = parseInt(row.Likes) || 0;
-              const comments = parseInt(row.Comments) || 0;
-              const shares = parseInt(row.Shares) || 0;
-              const err = parseFloat(row['ERR%']) || 0;
-              const errLevel = row.ERR_Level || 'Unknown';
-              
-              return {
-                id: idx,
-                date: row.Post_Date,
-                platform: row.Platform || 'Unknown',
-                region: row.Region || 'Unknown',
-                contentType: row.Content_Type || 'Unknown',
-                hashtag: row.Hashtag || '#General',
-                views,
-                likes,
-                comments,
-                shares,
-                err,
-                errLevel
-              };
-            });
-          
-          setAllData(transformedData);
-          setLoading(false);
-        },
-        error: (error) => {
-          setError(`Error parsing CSV: ${error.message}`);
-          setLoading(false);
-        }
-      });
-    } catch (err) {
-      setError(`Error loading CSV: ${err.message}`);
-      setLoading(false);
-    }
-  };
+        if (!response.ok) 
+          throw new Error('CSV file not found');
 
-  loadCSV(); /* loads csv */
+        const csvText = await response.text();
+        
+        Papa.parse(csvText, {
+          worker: true,
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const transformedData = results.data
+              .filter(row => row.Post_Date && row.Views)
+              .map((row, idx) => {
+                const views = parseInt(row.Views) || 0;
+                const likes = parseInt(row.Likes) || 0;
+                const comments = parseInt(row.Comments) || 0;
+                const shares = parseInt(row.Shares) || 0;
+                const err = parseFloat(row['ERR%']) || 0;
+                const errLevel = row.ERR_Level || 'Unknown';
+                // const distDays = parseInt(row.Dist_Days) || 0
+                // const decayedErr = parseFloat(row.Decayed_ERR) || 0
+
+                return {
+                  id: idx,
+                  date: row.Post_Date,
+                  platform: row.Platform || 'Unknown',
+                  region: row.Region || 'Unknown',
+                  contentType: row.Content_Type || 'Unknown',
+                  hashtag: row.Hashtag || '#General',
+                  views,
+                  likes,
+                  comments,
+                  shares,
+                  err,
+                  errLevel, 
+                  // distDays,
+                  // decayedErr
+                };
+              });
+            
+            setAllData(transformedData);
+          },
+          error: (error) => {
+            setError(`Error parsing CSV: ${error.message}`);
+            setLoading(false);
+          }
+        });
+
+        Papa.parse(csvText, {
+          worker: true,
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          complete: (results) => {
+            const importedData = results.data
+              .filter(row => row.Post_Date && row.Views)
+              .map((row) => {
+                const platform = row.Platform || 'Unknown';
+                const hashtag = row.Hashtag || '#General';
+                const contentType = row.Content_Type || 'Unknown';
+                const region = row.Region || 'Unknown';
+                const decayedErr = row.Decayed_ERR || 0;
+
+                return {platform, hashtag, contentType, region, decayedErr};
+              });
+
+            setAggregatedData(importedData)
+            setLoading(false);
+          },
+          error: (error) => {
+            setError(`Error parsing CSV: ${error.message}`);
+            setLoading(false);
+          }
+        });
+
+      } catch (err) {
+        setError(`Error loading CSV: ${err.message}`);
+        setLoading(false);
+      }
+    };
+
+    loadCSV(); /* loads csv */
   }, []);
 
   const uniqueRegions = useMemo(() =>
-  [...new Set(allData.map(d => d.region))].filter(Boolean).sort(),
-  [allData]
+    [...new Set(allData.map(d => d.region))].filter(Boolean).sort(),
+    [allData]
   );
   const uniquePlatforms = useMemo(() =>
-  [...new Set(allData.map(d => d.platform))].filter(Boolean).sort(),
-  [allData]
+    [...new Set(allData.map(d => d.platform))].filter(Boolean).sort(),
+    [allData]
   );
   const uniqueContentTypes = useMemo(() =>
-  [...new Set(allData.map(d => d.contentType))].filter(Boolean).sort(),
-  [allData]
+    [...new Set(allData.map(d => d.contentType))].filter(Boolean).sort(),
+    [allData]
   );
   const uniqueHashtags = useMemo(() =>
-  [...new Set(allData.map(d => d.hashtag))].filter(Boolean).sort(),
-  [allData]
+    [...new Set(allData.map(d => d.hashtag))].filter(Boolean).sort(),
+    [allData]
   );
 
   const filteredData = useMemo(() => {
-  return allData.filter(item => {
-  if (filters.region && item.region !== filters.region) return false;
-  if (filters.platform && item.platform !== filters.platform) return false;
-  if (filters.contentType && item.contentType !== filters.contentType) return false;
-  if (filters.hashtag && item.hashtag !== filters.hashtag) return false;
-  return true;
-  });
+    return allData.filter(item => {
+      // Conditions to see whether the record follows the filters.
+      if (filters.region && item.region !== filters.region) return false;
+      if (filters.platform && item.platform !== filters.platform) return false;
+      if (filters.contentType && item.contentType !== filters.contentType) return false;
+      if (filters.hashtag && item.hashtag !== filters.hashtag) return false;
+
+      return true;
+    });
   }, [allData, filters]);
 
   const metrics = useMemo(() => {
-  const totalViews = filteredData.reduce((sum, d) => sum + d.views, 0);
-  const totalLikes = filteredData.reduce((sum, d) => sum + d.likes, 0);
-  const totalComments = filteredData.reduce((sum, d) => sum + d.comments, 0);
-  const totalShares = filteredData.reduce((sum, d) => sum + d.shares, 0);
-  const avgErr = filteredData.length > 0
-  ? (filteredData.reduce((sum, d) => sum + d.err, 0) / filteredData.length).toFixed(2)
-  : 0;
+    const totalViews = filteredData.reduce((sum, d) => sum + d.views, 0);
+    const totalLikes = filteredData.reduce((sum, d) => sum + d.likes, 0);
+    const totalComments = filteredData.reduce((sum, d) => sum + d.comments, 0);
+    const totalShares = filteredData.reduce((sum, d) => sum + d.shares, 0);
+    const avgErr = filteredData.length > 0 
+    ? (filteredData.reduce((sum, d) => sum + d.err, 0) / filteredData.length).toFixed(2)
+    : 0;
 
-  return { totalViews, totalLikes, totalComments, totalShares, avgErr };
+    return { totalViews, totalLikes, totalComments, totalShares, avgErr };
   }, [filteredData]);
 
   const getRegionData = () => {
@@ -122,15 +165,15 @@ const Dashboard = () => {
       filteredData.forEach(d => {
         if (!grouped[d.region]) 
           grouped[d.region] = { views: 0, err: 0, count: 0 };
-          grouped[d.region].views += d.views;
-          grouped[d.region].err += d.err;
-          grouped[d.region].count += 1;
-        });
-        return Object.entries(grouped).map(([region, data]) => ({
-          region,
-          views: data.views,
-          err: (data.err / data.count).toFixed(2)
-    })).sort((a, b) => b.views - a.views);
+        grouped[d.region].views += d.views;
+        grouped[d.region].err += d.err;
+        grouped[d.region].count += 1;
+      });
+      return Object.entries(grouped).map(([region, data]) => ({
+        region,
+        views: data.views,
+        err: (data.err / data.count).toFixed(2)
+      })).sort((a, b) => b.views - a.views);
   };
 
   const getPlatformContentStats = () => {
@@ -138,7 +181,8 @@ const Dashboard = () => {
     
     filteredData.forEach(d => {
       const key = `${d.platform}|${d.contentType}`;
-      if (!lookup[key]) lookup[key] = { err: 0, count: 0 };
+      if (!lookup[key]) 
+        lookup[key] = { err: 0, count: 0 };
       lookup[key].err += d.err;
       lookup[key].count += 1;
     });
@@ -162,91 +206,140 @@ const Dashboard = () => {
   };
 
   const getPlatformData = () => {
-  const grouped = {};
-  filteredData.forEach(d => {
-  if (!grouped[d.platform]) grouped[d.platform] = { views: 0 };
-  grouped[d.platform].views += d.views;
-  });
-  return Object.entries(grouped).map(([platform, data]) => ({
-  platform,
-  views: data.views
-  }));
+    const grouped = {};
+    filteredData.forEach(d => {
+      if (!grouped[d.platform]) 
+          grouped[d.platform] = { views: 0 };
+      grouped[d.platform].views += d.views;
+    });
+    return Object.entries(grouped).map(([platform, data]) => ({
+      platform,
+      views: data.views
+    }));
   };
 
   const getContentTypeData = () => {
-  const grouped = {};
-  filteredData.forEach(d => {
-  if (!grouped[d.contentType]) grouped[d.contentType] = { err: 0, count: 0 };
-  grouped[d.contentType].err += d.err;
-  grouped[d.contentType].count += 1;
-  });
-  return Object.entries(grouped).map(([type, data]) => ({
-  type,
-  err: (data.err / data.count).toFixed(2)
-  })).sort((a, b) => b.err - a.err);
+    const grouped = {};
+    filteredData.forEach(d => {
+      if (!grouped[d.contentType]) 
+        grouped[d.contentType] = { err: 0, count: 0 };
+      grouped[d.contentType].err += d.err;
+      grouped[d.contentType].count += 1;
+    });
+
+    return Object.entries(grouped).map(([type, data]) => ({
+      type,
+      err: (data.err / data.count).toFixed(2)
+    })).sort((a, b) => b.err - a.err);
   };
 
   const getTrendData = () => {
-  const grouped = {};
-  filteredData.forEach(d => {
-  if (!grouped[d.date]) grouped[d.date] = { err: 0, count: 0 };
-  grouped[d.date].err += d.err;
-  grouped[d.date].count += 1;
-  });
-  return Object.entries(grouped)
-  .map(([date, data]) => ({
-  date,
-  err: (data.err / data.count).toFixed(2)
-  }))
-  .sort((a, b) => new Date(a.date) - new Date(b.date));
+    const grouped = {};
+    filteredData.forEach(d => {
+      if (!grouped[d.date]) 
+        grouped[d.date] = { err: 0, count: 0 };
+      grouped[d.date].err += d.err;
+      grouped[d.date].count += 1;
+    });
+    return Object.entries(grouped).map(([date, data]) => ({
+      date,
+      err: (data.err / data.count).toFixed(2)
+    })).sort(
+      (a, b) => new Date(a.date) - new Date(b.date)
+    );
   };
 
   const getHashtagData = () => {
-  const grouped = {};
-  filteredData.forEach(d => {
-  if (!grouped[d.hashtag]) grouped[d.hashtag] = { err: 0, count: 0 };
-  grouped[d.hashtag].err += d.err;
-  grouped[d.hashtag].count += 1;
-  });
-  return Object.entries(grouped)
-  .map(([hashtag, data]) => ({
-  hashtag,
-  err: (data.err / data.count).toFixed(2)
-  }))
-  .sort((a, b) => b.err - a.err);
+    const grouped = {};
+    filteredData.forEach(d => {
+      if (!grouped[d.hashtag]) 
+        grouped[d.hashtag] = { err: 0, count: 0 };
+      grouped[d.hashtag].err += d.err;
+      grouped[d.hashtag].count += 1;
+    });
+    return Object.entries(grouped)
+    .map(([hashtag, data]) => ({
+      hashtag,
+      err: (data.err / data.count).toFixed(2)
+    }))
+    .sort((a, b) => b.err - a.err);
   };
 
   const getScatterData = () => {
-      return filteredData
-        // Sort by views descending to show the most relevant data points
-        .sort((a, b) => b.views - a.views) 
-        .slice(0, 100)
-        .map(d => ({
-          likes: d.likes,
-          comments: d.comments,
-          shares: d.shares,
-          content: d.contentType,
-          errLevel: d.errLevel
-        }));
-    };
-
-  const getERRLevelDistribution = () => {
-  const grouped = { 'Low': 0, 'Average': 0, 'High': 0, 'Excellent': 0 };
-  filteredData.forEach(d => {
-  grouped[d.errLevel] = (grouped[d.errLevel] || 0) + 1;
-  });
-  return Object.entries(grouped).map(([level, count]) => ({ level, count }));
+    return filteredData
+      // Sort by views descending to show the most relevant data points
+      .sort((a, b) => b.views - a.views) 
+      .slice(0, 100)
+      .map(d => ({
+        likes: d.likes,
+        comments: d.comments,
+        shares: d.shares,
+        content: d.contentType,
+        errLevel: d.errLevel
+      }));
   };
 
+  const getERRLevelDistribution = () => {
+    const grouped = { 'Low': 0, 'Average': 0, 'High': 0, 'Excellent': 0 };
+    filteredData.forEach(d => {
+      grouped[d.errLevel] = (grouped[d.errLevel] || 0) + 1;
+    });
+    
+    return Object.entries(grouped).map(([level, count]) => ({ level, count }));
+  };
+
+    const filteredAggData = useMemo(() => {
+      return aggredatedData.filter(item => {
+        // Conditions to see whether the record follows the filters.
+        if (aggFilters.region && item.region !== aggFilters.region) return false;
+        if (aggFilters.contentType && item.contentType !== aggFilters.contentType) return false;
+        if (aggFilters.hashtag && item.hashtag !== aggFilters.hashtag) return false;
+
+        return true;
+      });
+  }, [aggregatedData, aggFilters]);
+
+  /**
+   * Changes the filter for the Aggregated Data
+   * 
+   * @param {string} key     Either of the following: region, hashtag, or content_type.
+   * @param {string} value   The new value for the respective key.
+   */
+  const handleAggFilterChange = (key, value) => {
+    setAggFilters(prev => ({
+        ...prev,
+        [key]: prev[key] === value ? null : value
+      }));
+  };
+
+  const getSuggestedPlatforms = () => {
+    const rankedPlatforms = {};
+
+    // a for loop for the newly filtered data. They will select the Hashtag, Content Type, and Region (Region can be global.)
+    // Can we make it such that it will only return a result once the user presses a button. 
+    //      And shows an error message if one of the entries are blank.
+    filteredAggData.forEach((data) => {
+      if (!rankedPlatforms[data.platform])
+          rankedPlatforms[data.platform] = {platform : data.platform,  decayedErr : 0}
+        rankedPlatforms[data.platform].decayedErr = data.decayedErr
+    })
+    const rankedArray = Object.values(rankedPlatforms);
+    rankedArray.sort((a, b) => { return b.decayedErr - a.decayedErr });
+    return rankedArray.map(item => ({
+      platform: item.platform,
+      errorRate: item.decayedErr
+    }));
+  }
+
   const handleFilterChange = (key, value) => {
-  setFilters(prev => ({
-  ...prev,
-  [key]: prev[key] === value ? null : value
-  }));
+    setFilters(prev => ({
+        ...prev,
+        [key]: prev[key] === value ? null : value
+      }));
   };
 
   const clearAllFilters = () => {
-  setFilters({ region: null, platform: null, contentType: null, hashtag: null });
+    setFilters({ region: null, platform: null, contentType: null, hashtag: null });
   };
 
   const activeFilterCount = Object.values(filters).filter(v => v !== null).length;
@@ -255,7 +348,8 @@ const Dashboard = () => {
 
   if (error) { return ( <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a)', display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}> <div style={{ background: '#7c2d12', border: '1px solid #b45309', borderRadius: '8px', padding: '32px', maxWidth: '500px', textAlign: 'center' }}> <h2 style={{ color: '#fff', fontSize: '24px', fontWeight: 'bold', marginBottom: '12px' }}>⚠️ Error</h2> <p style={{ color: '#fecaca', marginBottom: '16px' }}>{error}</p> <p style={{ color: '#fed7aa', fontSize: '14px' }}> Make sure <code style={{ background: '#92400e', padding: '4px 8px', borderRadius: '4px' }}>Cleaned_Data_Dashboard.csv</code> is in the <code style={{ background: '#92400e', padding: '4px 8px', borderRadius: '4px' }}>public</code> folder </p> </div> </div> ); }
 
-  return ( <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a)', padding: '24px', color: '#fff' }}> <div style={{ marginBottom: '32px' }}> <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '8px' }}>Viral Social Media Analytics</h1> <p style={{ color: '#94a3b8' }}>Cleaned data from {allData.length.toLocaleString()} posts | ERR anomalies filtered</p> </div>
+  return ( 
+  <div style={{ minHeight: '100vh', background: 'linear-gradient(to bottom right, #0f172a, #1e293b, #0f172a)', padding: '24px', color: '#fff' }}> <div style={{ marginBottom: '32px' }}> <h1 style={{ fontSize: '36px', fontWeight: 'bold', marginBottom: '8px' }}>Viral Social Media Analytics</h1> <p style={{ color: '#94a3b8' }}>Cleaned data from {allData.length.toLocaleString()} posts | ERR anomalies filtered</p> </div>
 
     {/* Filter Section */}
     <div style={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px', padding: '24px', marginBottom: '32px' }}>
@@ -673,6 +767,18 @@ const Dashboard = () => {
         </ul>
       </div>
     </div> {/* End of Insights Grid*/}
+
+    {/* Formula for the ERR: ((Likes + Comments + Shares) * 100) / 100 = ERR */}
+    
+    {/* 
+    
+    Suggesting the Platform given the Region, Hashtag, and Content Type, 
+
+    For the filter dropdowns, set onChange to use handleAggFilterChange('key', value)
+    To get the top 3 or 4 platforms (Ranked using Decayed ERR from highest to the lowest), use: getSuggestedPlatforms()
+    
+    */}
+    
   </div> // End of Dashboard
   );
 };
