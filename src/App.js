@@ -624,6 +624,7 @@ const Dashboard = () => {
         </ul>
       </div>
     </div>
+    
 
       {/* ERR CALCULATOR MODAL */}
       {showErrModal && (
