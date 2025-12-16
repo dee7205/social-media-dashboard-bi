@@ -346,7 +346,7 @@ const Dashboard = () => {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
           <Filter style={{ width: '20px', height: '20px', color: '#60a5fa' }} />
-          <h2 style={{ fontSize: '16px', fontWeight: 'bold' }}>Dashboard Filters</h2>
+          <h2 style={{ fontSize: '16px', fontWeight: 'bold' }}>Filter</h2>
           {activeFilterCount > 0 && <span style={{ background: '#2563eb', color: '#fff', fontSize: '12px', padding: '2px 8px', borderRadius: '9999px' }}>{activeFilterCount} active</span>}
         </div>
         <button
@@ -590,7 +590,7 @@ const Dashboard = () => {
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {getRegionData().slice(0, 3).map((r, i) => (
             <li key={r.region} style={{ fontSize: '14px', color: '#e2e8f0', marginBottom: '8px' }}>
-              {'🥇🥈🥉'[i]} <strong>{r.region}:</strong> {r.err}% ERR
+              {''[i]} <strong>{r.region}:</strong> {r.err}% ERR
             </li>
           ))}
         </ul>
@@ -600,7 +600,7 @@ const Dashboard = () => {
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {getContentTypeData().slice(0, 3).map((c, i) => (
             <li key={c.type} style={{ fontSize: '14px', color: '#e2e8f0', marginBottom: '8px' }}>
-              {'🥇🥈🥉'[i]} <strong>{c.type}:</strong> {c.err}% ERR
+              {''[i]} <strong>{c.type}:</strong> {c.err}% ERR
             </li>
           ))}
         </ul>
@@ -610,7 +610,7 @@ const Dashboard = () => {
         <ul style={{ listStyle: 'none', padding: 0, margin: 0 }}>
           {getHashtagData().slice(0, 3).map((h, i) => (
             <li key={h.hashtag} style={{ fontSize: '14px', color: '#e2e8f0', marginBottom: '8px' }}>
-              {'🥇🥈🥉'[i]} <strong>{h.hashtag}:</strong> {h.err}% ERR
+              {''[i]} <strong>{h.hashtag}:</strong> {h.err}% ERR
             </li>
           ))}
         </ul>
