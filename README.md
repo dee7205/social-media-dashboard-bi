@@ -1,70 +1,129 @@
-# Getting Started with Create React App
+<div align="center">
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+# 🚀 Viral Social Media Analytics Dashboard
 
-## Available Scripts
+> **A Business Intelligence (BI) tool designed to transform raw social media data into actionable content strategies.**
 
-In the project directory, you can run:
+![Project Status](https://img.shields.io/badge/Status-Active-success)
+![Tech Stack](https://img.shields.io/badge/Built%20With-React%20%7C%20Recharts%20%7C%20PapaParse-blue)
+![Deployment](https://img.shields.io/badge/Deployed%20on-Vercel-black)
 
-### `npm start`
+<br />
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+[**Explore the Live Demo »**](https://social-media-dashboard-bi.vercel.app/)
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+</div>
 
-### `npm test`
+---
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+## 📖 Overview
 
-### `npm run build`
+The **Viral Social Media Analytics Dashboard** is a Single Page Application (SPA) developed by **Team Gimatag** for the course **CSDS 313 (Business Intelligence)**.
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+Unlike traditional analytics tools that simply display what happened (*Descriptive Analytics*), this dashboard integrates **Prescriptive Analytics** to tell creators *what to do next*. It processes large datasets of social media engagement to identify viral trends, optimal content formats, and platform-specific opportunities.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+---
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+## ✨ Key Features
 
-### `npm run eject`
+### 📊 1. Interactive Analytics Dashboard
+* **Global KPI Banner:** Instant view of Total Views, Interactions, and Average Engagement Rate (ERR).
+* **Dynamic Filtering:** Filter data by Region, Platform, Content Type, and Hashtags.
+* **Visualizations:**
+    * **Bubble Chart:** Analyzes the relationship between Likes, Comments, and Shares (Virality).
+    * **Heatmap/Grouped Bar:** Identifies the "Winning Format" for each platform.
+    * **Trend Analysis:** Tracks engagement fluctuations over time.
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+### 🤖 2. AI Platform Strategist (New)
+A predictive modeling tool that helps creators decide where to post.
+* **How it works:** Uses historical "Decay Rate" data to rank platforms based on content longevity.
+* **Input:** Region, Content Format, Hashtag.
+* **Output:** A ranked list (Gold/Silver/Bronze) of platforms best suited for the content.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+### 🧮 3. Quick ERR Calculator (New)
+A real-time benchmarking tool for auditing competitor content.
+* **Features:**
+    * Calculates **Engagement Rate by Reach (ERR)** instantly.
+    * **Anomaly Detection:** Warns if engagement metrics exceed view counts.
+    * **Quality Grading:** Assigns a label (e.g., "Low", "Average", "Viral Status") based on industry benchmarks.
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+---
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+## 🛠️ Tech Stack
 
-## Learn More
+* **Frontend Library:** React.js (v18+)
+* **Visualization:** Recharts
+* **Data Parsing:** PapaParse (Client-side CSV processing)
+* **Icons:** Lucide React
+* **Deployment:** Vercel
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+---
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+## ⚙️ Installation & Setup
 
-### Code Splitting
+Follow these steps to run the project locally.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+### Prerequisites
+* Node.js (v18 or higher)
+* npm
 
-### Analyzing the Bundle Size
+### 1. Clone the Repository
+```bash
+git clone https://github.com/your-username/social-media-dashboard.git
+cd social-media-dashboard
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+```
 
-### Making a Progressive Web App
+### 2. Install Dependencies
+```bash
+npm install
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+### 3. Setup Data FilesEnsure the following CSV files are located in the `public/` folder:
 
-### Advanced Configuration
+* `Cleaned_Viral_Social_Media_Trends_FINAL.csv` (Main Dataset)
+* `For_Platform_Predicting.csv` (AI Training Data)
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+### 4. Run the Application
+```bash
+npm start
 
-### Deployment
+```
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) to view it in your browser.
 
-### `npm run build` fails to minify
+---
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+## 📂 Project Structure
+```text
+/src
+  ├── components
+  │   ├── ERRCalculator.js    <-- Real-time engagement calculator
+  │   └── platformSelector.js <-- AI Strategist UI logic
+  ├── Dashboard.js            <-- Main layout & Chart logic
+  ├── App.js                  <-- Route entry point
+  └── index.js
+/public
+  ├── Cleaned_Viral_Social_Media_Trends_FINAL.csv
+  └── For_Platform_Predicting.csv
+
+```
+
+---
+
+## 💡 How to Use
+1. **Exploratory Analysis:** Use the **Filters** on the main dashboard to drill down into specific regions (e.g., "Brazil") or hashtags (e.g., "#Gaming") to see what content performs best.
+2. **Strategic Planning:** Click the **✨ AI Strategist** button. Select your target parameters to receive a data-backed recommendation on which platform to prioritize.
+3. **Competitor Auditing:** Click the **🧮 ERR Calculator** button. Input the metrics from a competitor's post to verify if their engagement is genuine or low-quality.
+
+---
+
+## 👥 Authors**Team Gimatag**
+
+* **Dave Shanna Marie E. Gigawin**
+* **Allan C. Tagle**
+* **Wakin Cean C. Maclang**
+
+---
+
+*This project was built for educational purposes for the College of Information and Computing.*
