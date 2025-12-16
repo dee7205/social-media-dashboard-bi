@@ -1,3 +1,5 @@
+<div align="center">
+
 # 🚀 Viral Social Media Analytics Dashboard
 
 > **A Business Intelligence (BI) tool designed to transform raw social media data into actionable content strategies.**
@@ -6,13 +8,19 @@
 ![Tech Stack](https://img.shields.io/badge/Built%20With-React%20%7C%20Recharts%20%7C%20PapaParse-blue)
 ![Deployment](https://img.shields.io/badge/Deployed%20on-Vercel-black)
 
+<br />
+
+[**Explore the Live Demo »**](https://social-media-dashboard-bi.vercel.app/)
+
+</div>
+
+---
+
 ## 📖 Overview
 
-The **Viral Social Media Analytics Dashboard** is a Single Page Application (SPA) developed by **Team Gimatag** for the course **CSDS 313 (Business Intelligence)**. 
+The **Viral Social Media Analytics Dashboard** is a Single Page Application (SPA) developed by **Team Gimatag** for the course **CSDS 313 (Business Intelligence)**.
 
 Unlike traditional analytics tools that simply display what happened (*Descriptive Analytics*), this dashboard integrates **Prescriptive Analytics** to tell creators *what to do next*. It processes large datasets of social media engagement to identify viral trends, optimal content formats, and platform-specific opportunities.
-
-🔗 **Live Demo:** [https://social-media-dashboard-bi.vercel.app/](https://social-media-dashboard-bi.vercel.app/)
 
 ---
 
@@ -61,31 +69,36 @@ Follow these steps to run the project locally.
 
 ### 1. Clone the Repository
 ```bash
-git clone [https://github.com/your-username/social-media-dashboard.git](https://github.com/your-username/social-media-dashboard.git)
+git clone https://github.com/your-username/social-media-dashboard.git
 cd social-media-dashboard
-2. Install Dependencies
-Bash
 
+```
+
+### 2. Install Dependencies
+```bash
 npm install
-3. Setup Data Files
-Ensure the following CSV files are located in the public/ folder:
+```
 
-Cleaned_Viral_Social_Media_Trends_FINAL.csv (Main Dataset)
+### 3. Setup Data FilesEnsure the following CSV files are located in the `public/` folder:
 
-For_Platform_Predicting.csv (AI Training Data)
+* `Cleaned_Viral_Social_Media_Trends_FINAL.csv` (Main Dataset)
+* `For_Platform_Predicting.csv` (AI Training Data)
 
-4. Run the Application
-Bash
-
+### 4. Run the Application
+```bash
 npm start
-Open http://localhost:3000 to view it in your browser.
 
-📂 Project Structure
-Plaintext
+```
 
+Open [http://localhost:3000](https://www.google.com/search?q=http://localhost:3000) to view it in your browser.
+
+---
+
+## 📂 Project Structure
+```text
 /src
   ├── components
-  │   ├── ErrCalculator.js    <-- Real-time engagement calculator
+  │   ├── ERRCalculator.js    <-- Real-time engagement calculator
   │   └── platformSelector.js <-- AI Strategist UI logic
   ├── Dashboard.js            <-- Main layout & Chart logic
   ├── App.js                  <-- Route entry point
@@ -93,17 +106,24 @@ Plaintext
 /public
   ├── Cleaned_Viral_Social_Media_Trends_FINAL.csv
   └── For_Platform_Predicting.csv
-💡 How to Use
-Exploratory Analysis: Use the Filters on the main dashboard to drill down into specific regions (e.g., "Brazil") or hashtags (e.g., "#Gaming") to see what content performs best.
 
-Strategic Planning: Click the ✨ AI Strategist button. Select your target parameters to receive a data-backed recommendation on which platform to prioritize.
+```
 
-Competitor Auditing: Click the 🧮 ERR Calculator button. Input the metrics from a competitor's post to verify if their engagement is genuine or low-quality.
+---
 
-👥 Authors
-Team Gimatag
-1. Dave Shanna Marie E. Gigawin
-2. Allan C. Tagle
-3. Wakin Cean C. Maclang
+## 💡 How to Use
+1. **Exploratory Analysis:** Use the **Filters** on the main dashboard to drill down into specific regions (e.g., "Brazil") or hashtags (e.g., "#Gaming") to see what content performs best.
+2. **Strategic Planning:** Click the **✨ AI Strategist** button. Select your target parameters to receive a data-backed recommendation on which platform to prioritize.
+3. **Competitor Auditing:** Click the **🧮 ERR Calculator** button. Input the metrics from a competitor's post to verify if their engagement is genuine or low-quality.
 
-This project was built for educational purposes for the College of Information and Computing.
+---
+
+## 👥 Authors**Team Gimatag**
+
+* **Dave Shanna Marie E. Gigawin**
+* **Allan C. Tagle**
+* **Wakin Cean C. Maclang**
+
+---
+
+*This project was built for educational purposes for the College of Information and Computing.*
