@@ -485,13 +485,52 @@ const Dashboard = () => {
         <h3 style={{ fontSize: '18px', fontWeight: 'bold', marginBottom: '16px' }}>Platform Views Distribution</h3>
         <ResponsiveContainer width="100%" height={300}>
           <PieChart>
-            <Pie data={getPlatformData()} dataKey="views" nameKey="platform" cx="50%" cy="50%" outerRadius={100} label>
-              <Cell fill="#3b82f6" />
-              <Cell fill="#8b5cf6" />
-              <Cell fill="#ec4899" />
-              <Cell fill="#f59e0b" />
+            <Pie 
+              data={getPlatformData()} 
+              dataKey="views" 
+              nameKey="platform" 
+              cx="50%" 
+              cy="50%" 
+              outerRadius={80}
+              label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index, name }) => {
+                const RADIAN = Math.PI / 180;
+                const radius = outerRadius * 1.25;
+                const x = cx + radius * Math.cos(-midAngle * RADIAN);
+                const y = cy + radius * Math.sin(-midAngle * RADIAN);
+                const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'];
+                const color = colors[index % colors.length];
+                
+                return (
+                  <text 
+                    x={x} 
+                    y={y} 
+                    fill={color} 
+                    textAnchor={x > cx ? 'start' : 'end'} 
+                    dominantBaseline="central" 
+                    style={{ fontSize: '12px', fontWeight: 'bold' }}
+                  >
+                    {`${name} ${(percent * 100).toFixed(0)}%`}
+                  </text>
+                );
+              }}
+              labelLine={{ strokeWidth: 1 }} 
+            >
+              {getPlatformData().map((entry, index) => {
+                const colors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b'];
+                return <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />;
+              })}
             </Pie>
-            <Tooltip contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px' }} />
+            <Tooltip 
+              contentStyle={{ backgroundColor: '#1e293b', border: '1px solid #475569', borderRadius: '8px', color: '#fff' }} 
+              itemStyle={{ color: '#fff' }}
+              formatter={(value) => value.toLocaleString()} 
+            />
+            <Legend 
+              verticalAlign="bottom" 
+              height={36} 
+              iconType="circle"
+              wrapperStyle={{ color: '#cbd5e1', paddingTop: '10px' }} 
+            />
           </PieChart>
         </ResponsiveContainer>
       </div>
