@@ -33,13 +33,13 @@ const PlatformSelector = ({
   };
 
   return (
-    // FIXED: Balanced padding (24px) and proper box-sizing
+    // Balanced padding (24px) and proper box-sizing
     <div style={{ width: '100%', padding: '0 28px 28px 28px', boxSizing: 'border-box' }}> 
       
       {/* Increased top margin to separate from the Modal Header */}
       <div style={{ margin: '24px 0 32px 0', textAlign: 'center' }}>
         <p style={{ color: '#94a3b8', fontSize: '15px' }}>
-          Select your target parameters below to generate an AI-driven platform recommendation.
+          Select your target parameters below to generate a data-driven platform recommendation.
         </p>
       </div>
 

@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { 
-  BarChart, Bar, LineChart, Line, ScatterChart, Scatter, 
+  BarChart, Bar, ScatterChart, Scatter, 
   XAxis, YAxis, ZAxis, CartesianGrid, Tooltip, Legend, 
   ResponsiveContainer, PieChart, Pie, Cell, AreaChart, Area 
 } from 'recharts';
-import { Filter, X, Loader, Sparkles, Bot } from 'lucide-react';
+import { Filter, X, Loader, Sparkles, Bot, Calculator, Info } from 'lucide-react';
 import Papa from 'papaparse';
 import PlatformSelector from './platformSelector';
-import { Calculator } from 'lucide-react'; // Add Calculator to the import list from 'lucide-react'
-import ErrCalculator from './ERRCalculator'; // Import the new component
+import ErrCalculator from './ERRCalculator';
+import AboutModal from './AboutModal';
 
 const Dashboard = () => {
   const [allData, setAllData] = useState([]);
@@ -34,6 +34,7 @@ const Dashboard = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showAIModal, setShowAIModal] = useState(false);
   const [showErrModal, setShowErrModal] = useState(false);
+  const [showAboutModal, setShowAboutModal] = useState(false);
 
   useEffect(() => {
     const loadCSV = async () => {
@@ -298,6 +299,28 @@ const Dashboard = () => {
       
       {/* Action Buttons */}
       <div style={{ display: 'flex', gap: '12px' }}>
+        {/* About Button */}
+        <button
+          onClick={() => setShowAboutModal(true)}
+          style={{
+            background: 'transparent',
+            border: '1px solid #475569',
+            color: '#94a3b8',
+            padding: '10px 14px',
+            borderRadius: '8px',
+            fontWeight: '600',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '8px',
+            cursor: 'pointer',
+            transition: 'all 0.2s'
+          }}
+          onMouseEnter={(e) => { e.target.style.background = '#334155'; e.target.style.color = '#fff'; }}
+          onMouseLeave={(e) => { e.target.style.background = 'transparent'; e.target.style.color = '#94a3b8'; }}
+        >
+          <Info size={18} /> About
+        </button>
+
         <button
           onClick={() => setShowAIModal(true)}
           style={{
@@ -314,10 +337,10 @@ const Dashboard = () => {
             boxShadow: '0 4px 15px rgba(124, 58, 237, 0.3)'
           }}
         >
-          <Sparkles size={18} /> AI Strategist
+          <Sparkles size={18} /> Platform Strategist
         </button>
 
-        {/* NEW: ERR Calculator Button */}
+        {/* ERR Calculator Button */}
         <button
           onClick={() => setShowErrModal(true)}
           style={{
@@ -338,10 +361,11 @@ const Dashboard = () => {
         >
           <Calculator size={18} /> ERR Calculator
         </button>
+
       </div>
     </div>
 
-    {/* Main Filters (Collapsible) */}
+    {/* Main Filters */}
     <div style={{ background: '#1e293b', border: '1px solid #475569', borderRadius: '8px', padding: '16px', marginBottom: '32px' }}>
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
@@ -664,7 +688,7 @@ const Dashboard = () => {
           <div style={{ background: '#0f172a', borderRadius: '16px', border: '1px solid #334155', boxShadow: '0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 8px 10px -6px rgba(0, 0, 0, 0.1)', overflow: 'hidden' }}>
              <div style={{ background: '#1e293b', padding: '20px', borderBottom: '1px solid #334155', display: 'flex', alignItems: 'center', gap: '12px' }}>
                 <Bot size={24} color="#a78bfa" />
-                <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white' }}>AI Platform Strategist</h2>
+                <h2 style={{ fontSize: '20px', fontWeight: 'bold', color: 'white' }}>Platform Strategist</h2>
              </div>
              <div style={{ padding: '4px' }}>
                 <PlatformSelector 
@@ -680,6 +704,9 @@ const Dashboard = () => {
         </div>
       </div>
     )}
+
+    {showAboutModal && <AboutModal onClose={() => setShowAboutModal(false)} />}
+
 
   </div>
   );
